@@ -12,6 +12,11 @@ var pfd;
 if ( typeof pfd === 'undefined' ) {
 
 pfd = {};
+pfd.getUTCDate = function () {
+	var now = new Date();
+	return new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+};
+
 pfd.generateTOC = function ( data ) {
 	var	page, shortTitle, rev, i, l,
 		toc = [];
@@ -104,7 +109,7 @@ pfd.parse = function ( titles ) {
 };
 
 pfd.filter = function ( date ) {
-	var	today = $.datepicker.formatDate('yymmdd', new Date() );
+	var	today = $.datepicker.formatDate('yymmdd', pfd.getUTCDate() );
 	pfd.selectedDate = date || mw.util.getParamValue('data') || today;
 	pfd.selectedPages = [];
 	/*jslint unparam: true*/
@@ -262,7 +267,8 @@ pfd.run = function () {
 					'?data=' + formattedDate;
 			}
 		},
-		beforeShowDay: pfd.beforeShowDay
+		beforeShowDay: pfd.beforeShowDay,
+		defaultDate: pfd.getUTCDate()
 	});
 	if ( urlDate ) {
 		pfd.$calendar.datepicker('setDate', $.datepicker.parseDate('yymmdd', urlDate) );
