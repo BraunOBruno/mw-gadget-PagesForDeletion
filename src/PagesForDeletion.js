@@ -62,16 +62,34 @@ pfd.getDataForTOC = function ( list ) {
 };
 
 pfd.show = function ( html ) {
-	var target;
-	pfd.$target.append( html );
-	$('#toc').remove();
+    var target;
 
-	/* Add popups compatibility */
-	target = pfd.$target.get(0);
-	if ( typeof window.setupTooltips === "function" ) {
-		target.ranSetupTooltipsAlready = false;
-		window.setupTooltips( target );
-	}
+    pfd.$target.append( html );
+    $( '#toc' ).remove();
+
+    /* Inject edit links */
+    pfd.$target.find( 'h2, h3' ).each( function () {
+        var $h = $( this ),
+            $span = $h.find( 'span.mw-headline' ),
+            sectionText = $span.length ? $span.text() : $h.text(),
+            pageUrl, editUrl, $links;
+
+        if ( $h.find( '.pfd-edit-links' ).length ) return;
+
+        pageUrl = sectionText;
+        editUrl = sectionText + '?action=edit';
+
+        $links = $(
+            '<span class="pfd-edit-links" style="font-size:85%; font-weight:normal; margin-left:0.5em;">' +
+            '(<a href="' + pageUrl + '">ver</a>' +
+            '/<a href="' + editUrl + '">editar</a>)' +
+            '</span>'
+        );
+        $h.append( $links );
+    } );
+
+    /* Popups compatibility via hook */
+    mw.hook( 'wikipage.content' ).fire( pfd.$target );
 };
 
 pfd.parse = function ( titles ) {
